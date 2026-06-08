@@ -1,19 +1,30 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOrder } from '../context/OrderContext';
 
 const OrderStartScreen = () => {
   const navigate = useNavigate();
-  const { session } = useOrder();
+  const { session, initSession } = useOrder();
+
+  useEffect(() => {
+    // Initialize session if it doesn't exist (e.g., direct URL access)
+    if (!session) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const qrId = urlParams.get('qr') || undefined;
+      initSession(qrId);
+    }
+  }, [session, initSession]);
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-white flex items-center justify-center p-4">
         <div className="card p-8 max-w-md w-full text-center">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold mb-4">Invalid QR Code</h2>
-          <p className="text-gray-600 mb-6">
-            This QR Code is no longer valid. Please ask the cashier to generate a new QR Code.
-          </p>
+          <div className="animate-pulse">
+            <div className="w-16 h-16 mx-auto mb-4 bg-primary-600 rounded-full flex items-center justify-center">
+              <span className="text-3xl">☕</span>
+            </div>
+          </div>
+          <p className="text-gray-600">Initializing your session...</p>
         </div>
       </div>
     );
